@@ -13,16 +13,21 @@ export default defineConfig(({ mode }) => {
           '@': path.resolve(__dirname, '.'),
         }
       },
-      build: { // ADD THIS ENTIRE BUILD OBJECT
-        lib: {
-          entry: path.resolve(__dirname, 'public', 'index.html'), // Explicitly point to index.html within public
-          name: 'App', // A name for your app, can be anything
-          formats: ['es'] // Output format as ES module
-        },
+      build: { // Keep this build object
+        outDir: 'dist', // Output to the 'dist' folder at the project root
+        emptyOutDir: true, // Clear the dist folder before building
         rollupOptions: {
-          // No specific output options needed unless you have custom requirements
-        },
-        emptyOutDir: true // Clear the dist folder before building
+          input: {
+            // IMPORTANT: This tells Vite that your application's entry point is index.tsx
+            main: path.resolve(__dirname, 'src', 'index.tsx')
+          },
+          output: {
+            // This will output the main JS bundle directly as 'index.js' in the dist folder
+            entryFileNames: `[name].js`,
+            chunkFileNames: `[name].js`,
+            assetFileNames: `[name].[ext]`
+          }
+        }
       }
     };
 });
