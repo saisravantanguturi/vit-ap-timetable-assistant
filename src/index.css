@@ -1,0 +1,43 @@
+/* Tailwind CSS directives - MUST be at the top */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Your Custom CSS Variables and Global Styles */
+:root {
+  /* Base Colors */
+  --color-text-base-rgb: 30 41 59; /* slate-800 */
+  --color-text-muted-rgb: 71 85 105; /* slate-500 */
+  --color-bg-rgb: 241 245 249; /* slate-100 */
+  --color-surface-rgb: 255 255 255; /* white */
+  --color-border-rgb: 226 232 240; /* slate-200 */
+  --color-input-bg-rgb: 255 255 255; /* white */
+  --color-ring-rgb: 59 130 246; /* blue-500 */
+}
+.dark {
+  --color-text-base-rgb: 226 232 240; /* slate-200 */
+  --color-text-muted-rgb: 148 163 184; /* slate-400 */
+  --color-bg-rgb: 15 23 42; /* slate-900 */
+  --color-surface-rgb: 30 41 59; /* slate-800 */
+  --color-border-rgb: 51 65 85; /* slate-700 */
+  --color-input-bg-rgb: 51 65 85; /* slate-700 */
+  --color-ring-rgb: 96 165 250; /* blue-400 */
+}
+.accent-blue { --color-primary-rgb: 59 130 246; --color-primary-fg-rgb: 255 255 255; }
+.dark.accent-blue { --color-primary-rgb: 96 165 250; --color-primary-fg-rgb: 219 234 254; }
+.accent-pink { --color-primary-rgb: 236 72 153; --color-primary-fg-rgb: 255 255 255; }
+.dark.accent-pink { --color-primary-rgb: 244 114 182; --color-primary-fg-rgb: 253 232 248; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: rgb(var(--color-bg-rgb));
+  color: rgb(var(--color-text-base-rgb));
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(1rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}

@@ -1,0 +1,5 @@
+{
+  "name": "VIT-AP Timetable Assistant",
+  "description": "A smart timetable application that helps students at VIT-AP manage their daily schedule, view classes for the current day, and identify free slots. It also provides a motivational quote on days off.",
+  "requestFramePermissions": []
+}
