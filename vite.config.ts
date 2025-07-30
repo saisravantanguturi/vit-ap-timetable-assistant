@@ -19,15 +19,14 @@ export default defineConfig(({ mode }) => {
                 input: path.resolve(__dirname, 'src', 'index.tsx'),
                 output: {
                     entryFileNames: 'index.js',
-                    // IMPORTANT: Change assetFileNames to put all assets directly in dist/
-                    assetFileNames: '[name].[ext]', // <--- CHANGED THIS LINE
-                    // Vite will auto-hash assets if it needs to, but this simplifies pathing.
-                    // If it still hashes, we'll need to re-verify the exact name in `dist`
-                    // or switch to a hash-agnostic approach if necessary.
-                    // Let's try this simple output first.
-                    chunkFileNames: '[name]-[hash].js', // Keep chunks with hash
+                    // IMPORTANT: Flatten asset output directly into dist/
+                    assetFileNames: '[name].[ext]', // <--- CHANGED THIS LINE to remove 'assets/' prefix
+                    chunkFileNames: 'chunks/[name]-[hash].js', // Put JS chunks in a 'chunks' subfolder
                 },
             },
+            // IMPORTANT: This tells Vite to output all assets (including CSS) directly into the 'outDir' (dist).
+            // It overrides the default behavior of putting them in 'dist/assets'.
+            assetsDir: '' // <--- ADD THIS LINE
         },
     };
 });
