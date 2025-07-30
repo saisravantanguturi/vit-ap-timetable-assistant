@@ -1,37 +1,33 @@
 import { defineConfig, loadEnv } from 'vite';
-import path from 'path'; // Needed for path.resolve
+import path from 'path';
 
 export default defineConfig(({ mode }) => {
-    const env = loadEnv(mode, process.cwd(), ''); // process.cwd() is standard here
+    const env = loadEnv(mode, process.cwd(), '');
     return {
         define: {
-            // Correctly define environment variables for access in your app
             'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
         },
         resolve: {
             alias: {
-                // This alias lets you use @/ to refer to your src folder (e.g., import App from '@/App')
                 '@': path.resolve(__dirname, './src'),
             },
         },
         build: {
-            outDir: 'dist',         // Output built files to a 'dist' folder at the root of your project
-            emptyOutDir: true,      // Clear the 'dist' folder before building
+            outDir: 'dist',
+            emptyOutDir: true,
             rollupOptions: {
-                // This specifies the main entry point for your JavaScript/TypeScript application
                 input: path.resolve(__dirname, 'src', 'index.tsx'),
                 output: {
-                    // This tells Vite/Rollup to name your main JavaScript bundle 'index.js'
                     entryFileNames: 'index.js',
-                    // These lines ensure other generated files (like CSS, image assets, and other JS chunks)
-                    // go into an 'assets' subfolder within 'dist' with unique hashes.
-                    chunkFileNames: 'assets/[name]-[hash].js',
-                    assetFileNames: 'assets/[name]-[hash].[ext]',
+                    // IMPORTANT: Change assetFileNames to put all assets directly in dist/
+                    assetFileNames: '[name].[ext]', // <--- CHANGED THIS LINE
+                    // Vite will auto-hash assets if it needs to, but this simplifies pathing.
+                    // If it still hashes, we'll need to re-verify the exact name in `dist`
+                    // or switch to a hash-agnostic approach if necessary.
+                    // Let's try this simple output first.
+                    chunkFileNames: '[name]-[hash].js', // Keep chunks with hash
                 },
             },
         },
-        // The 'publicDir' option (by default 'public') automatically copies 'public/index.html'
-        // to the 'outDir' ('dist') and injects the bundled scripts.
-        // You don't need to manually specify it unless your public folder is named something else.
     };
 });
