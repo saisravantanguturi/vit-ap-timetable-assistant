@@ -15,7 +15,7 @@ export const LocationIcon = ({ className }: { className?: string }) => (
 
 export const TagIcon = ({ className }: { className?: string }) => (
   <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M7 7h.01M7 3h5a2 2 0 012 2v5a2 2 0 01-2 2H7a2 2 0 01-2-2V5a2 2 0 012-2z" />
+    <path strokeLinecap="round" strokeLinecap="round" d="M7 7h.01M7 3h5a2 2 0 012 2v5a2 2 0 01-2 2H7a2 2 0 01-2-2V5a2 2 0 012-2z" />
     <path strokeLinecap="round" strokeLinejoin="round" d="M7 15h2v2H7v-2z" />
     <path strokeLinecap="round" strokeLinejoin="round" d="M15 3h5a2 2 0 012 2v5a2 2 0 01-2 2h-5a2 2 0 01-2-2V5a2 2 0 012-2z" />
     <path strokeLinecap="round" strokeLinejoin="round" d="M15 15h2v2h-2v-2z" />
@@ -100,9 +100,13 @@ export const LockClosedIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+// Corrected Google Icon with multiple paths for colors
 export const GoogleIcon = ({ className }: { className?: string }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="currentColor">
-    <path d="M12.24 10.23c-.23-.73-.23-1.7-.01-2.45l2.25-1.93c.09-.09.13-.23.13-.36V3.88c0-.14-.05-.28-.15-.38l-1.92-2.18c-.09-.1-.23-.15-.37-.15H1.4c-.05 0-.1.02-.13.06-.03.04-.05.09-.05.15v20.06c0 .06.02.12.05.16.03.04.08.06.13.06h18.23c.14 0 .28-.05.37-.15l1.92-2.18c.1-.1.15-.24.15-.38v-1.68c0-.13-.04-.27-.13-.36l-2.25-1.93c-.22-.75-.22-1.72.01-2.45.24-.77.37-1.42.37-2.13 0-.7-.13-1.35-.37-2.12zM12.82 12c-1.38 0-2.5-.96-2.5-2.15S11.44 7.7 12.82 7.7c1.38 0 2.5.96 2.5 2.15S14.2 12 12.82 12z" />
+  <svg className={className} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M22.03 12.001c0-.75-.06-1.5-.18-2.22H12v4.18h5.66c-.25 1.3-1.03 2.4-2.27 3.16v2.73h3.5c2.05-1.88 3.23-4.63 3.23-7.85z" fill="#4285F4"/>
+    <path d="M12 22c3.27 0 6.01-1.08 8-2.92l-3.5-2.73c-1 1.05-2.3 1.66-4.5 1.66-3.48 0-6.44-2.34-7.5-5.5H.8v2.81c2.05 4.07 6.13 6.98 11.2 6.98z" fill="#34A853"/>
+    <path d="M4.5 14.18c-.2-1.05-.2-2.15 0-3.2v-2.81H.8c-1.04 2.06-1.04 4.34 0 6.41l3.7 2.81z" fill="#FBBC05"/>
+    <path d="M12 4.58c1.8-.02 3.51.7 4.75 1.85l3.07-3.07C18.01 1.67 15.27.5 12 .5c-5.07 0-9.15 2.91-11.2 6.98l3.7 2.81c1.06-3.16 4.02-5.5 7.5-5.5z" fill="#EA4335"/>
   </svg>
 );
 
