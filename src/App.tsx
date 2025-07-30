@@ -5,7 +5,17 @@ import TimetableView from './components/TimetableView';
 import EditTimetableView from './components/EditTimetableView';
 import WeekView from './components/WeekView';
 import Toast from './components/Toast';
+// Make sure all icons are exported from icons.tsx properly, or adjust imports as needed.
+// If you're using `export const Icons = { ... }` from icons.tsx, you would import like:
+// import { Icons } from './components/icons';
+// and then use <Icons.Calendar /> etc.
+// For now, keeping individual imports as in your previous App.tsx.
 import { CalendarIcon, SunIcon, MoonIcon, MaleIcon, FemaleIcon } from './components/icons';
+
+// NEW IMPORTS FOR AUTHENTICATION
+import LoginPage from './components/LoginPage'; // <--- NEW
+import { auth } from './firebase'; // <--- NEW: Import auth from your firebase.ts
+import { onAuthStateChanged, signOut, User } from 'firebase/auth'; // <--- NEW: Import auth state listener and sign out
 
 type ToastMessage = {
   message: string;
@@ -28,6 +38,10 @@ interface AppContextType {
   toast: ToastMessage | null;
   showToast: (message: string, type: ToastMessage['type']) => void;
   hideToast: () => void;
+  // NEW: Add currentUser and signOutUser to context
+  currentUser: User | null; // <--- NEW
+  signOutUser: () => void; // <--- NEW
+  authLoading: boolean; // <--- NEW: Add authLoading to context type
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -40,25 +54,42 @@ export const useApp = () => {
 
 const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [timetable, setTimetable] = useState<TimetableData>({});
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true); // For localStorage loading
   const [timeFormat, setTimeFormatState] = useState<TimeFormat>('24h');
   const [theme, setThemeState] = useState<Theme>('light');
   const [accent, setAccentState] = useState<Accent>('blue');
   const [toast, setToast] = useState<ToastMessage | null>(null);
+  // NEW: State for current user and authentication loading
+  const [currentUser, setCurrentUser] = useState<User | null>(null); // <--- NEW
+  const [authLoading, setAuthLoading] = useState(true); // <--- NEW: State to track if auth is initialized
 
   const showToast = (message: string, type: ToastMessage['type'] = 'info') => {
     setToast({ message, type });
   };
-  
+
   const hideToast = () => {
     setToast(null);
   };
 
+  // --- PRIMARY AUTHENTICATION LISTENER ---
+  // This useEffect listens for Firebase auth state changes and sets currentUser/authLoading.
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+      setAuthLoading(false); // Auth state is now loaded (user is null or User object)
+      // Optionally load user-specific timetable from Firestore/DB here if you implement it
+      // For now, timetable loads from localStorage regardless of user.
+    });
+    return unsubscribe; // Clean up the listener on unmount
+  }, []); // Empty dependency array means this runs once on mount
+
+  // --- Existing localStorage effect for timetable and settings ---
+  // This runs independently of auth, loading generic settings/timetable
   useEffect(() => {
     try {
       const savedData = localStorage.getItem('timetable');
       if (savedData) setTimetable(JSON.parse(savedData));
-      
+
       const savedFormat = localStorage.getItem('timeFormat') as TimeFormat;
       if (savedFormat && (savedFormat === '12h' || savedFormat === '24h')) setTimeFormatState(savedFormat);
 
@@ -71,10 +102,11 @@ const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     } catch (error) {
       console.error("Failed to load data from localStorage", error);
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Set isLoading to false after localStorage attempt
     }
-  }, []);
-  
+  }, []); // Runs once on mount
+
+  // --- Theme/Accent class application (remains the same) ---
   useEffect(() => {
     const root = document.documentElement;
     root.classList.remove('light', 'dark', 'accent-blue', 'accent-pink');
@@ -82,6 +114,7 @@ const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   }, [theme, accent]);
 
 
+  // --- Timetable Save/Update/Delete functions (remains the same) ---
   const saveTimetable = (data: TimetableData) => {
     try {
       localStorage.setItem('timetable', JSON.stringify(data));
@@ -89,19 +122,19 @@ const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       console.error("Failed to save timetable to localStorage", error);
     }
   };
-  
+
   const setTimeFormat = (format: TimeFormat) => {
     if (format === '12h' || format === '24h') {
         setTimeFormatState(format);
         localStorage.setItem('timeFormat', format);
     }
   }
-  
+
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
     localStorage.setItem('theme', newTheme);
   };
-  
+
   const setAccent = (newAccent: Accent) => {
     setAccentState(newAccent);
     localStorage.setItem('accent', newAccent);
@@ -116,7 +149,7 @@ const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       return newTimetable;
     });
   };
-  
+
   const updateClass = (day: string, updatedEntry: ClassEntry) => {
     setTimetable(prev => {
         const dayEntries = (prev[day] || []).map(entry =>
@@ -139,12 +172,32 @@ const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     });
   };
 
-  const value = { timetable, addClass, updateClass, deleteClass, isLoading, timeFormat, setTimeFormat, theme, setTheme, accent, setAccent, toast, showToast, hideToast };
+  // --- NEW: Sign out function ---
+  const signOutUser = async () => {
+    try {
+      await signOut(auth);
+      showToast('Logged out successfully.', 'info');
+      // Optionally clear timetable data if it's user-specific
+      localStorage.removeItem('timetable'); // Clear existing local timetable data
+      setTimetable({}); // Clear local timetable state
+    } catch (error: any) {
+      console.error("Logout Error:", error);
+      showToast(error.message || 'Failed to log out.', 'error');
+    }
+  };
+
+  const value = {
+    timetable, addClass, updateClass, deleteClass, isLoading,
+    timeFormat, setTimeFormat, theme, setTheme, accent, setAccent,
+    toast, showToast, hideToast,
+    // NEW values for context
+    currentUser, signOutUser, authLoading // <--- NEW: Add currentUser, signOutUser, and authLoading to context value
+  };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
 
-// --- Live Time Hook ---
+// --- Live Time Hook (remains the same) ---
 const useLiveTime = () => {
   const [now, setNow] = useState(new Date());
   useEffect(() => {
@@ -154,17 +207,17 @@ const useLiveTime = () => {
   return now;
 };
 
-// --- Header Component ---
+// --- Header Component (Updated to show user email and logout button) ---
 const Header: React.FC = () => {
   const now = useLiveTime();
-  const { timeFormat, theme, setTheme, accent, setAccent } = useApp();
-  
+  const { timeFormat, theme, setTheme, accent, setAccent, signOutUser, currentUser } = useApp(); // <--- Get signOutUser and currentUser from context
+
   const dateString = now.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
   const timeString = now.toLocaleTimeString('en-US', { hour12: timeFormat === '12h', hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
   const toggleTheme = () => setTheme(theme === 'light' ? 'dark' : 'light');
   const toggleAccent = () => setAccent(accent === 'blue' ? 'pink' : 'blue');
-  
+
   return (
     <header className="bg-surface/80 backdrop-blur-lg shadow-sm sticky top-0 z-50 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -194,6 +247,20 @@ const Header: React.FC = () => {
             <button onClick={toggleTheme} className="p-2 rounded-full text-text-muted hover:bg-primary/10 hover:text-primary transition-colors" aria-label="Toggle Theme">
                 {theme === 'light' ? <MoonIcon className="w-5 h-5"/> : <SunIcon className="w-5 h-5"/>}
             </button>
+            {/* NEW: Display user email and logout button conditionally */}
+            {currentUser && (
+                <div className="hidden sm:flex items-center space-x-2 ml-2">
+                    <span className="text-sm font-medium text-text-muted hidden md:block">
+                        {currentUser.email}
+                    </span>
+                    <button 
+                        onClick={signOutUser} 
+                        className="px-3 py-1 text-sm rounded-md text-text-muted hover:bg-red-500/10 hover:text-red-500 transition-colors border border-border-color"
+                    >
+                        Sign Out
+                    </button>
+                </div>
+            )}
           </div>
         </div>
       </div>
@@ -201,7 +268,7 @@ const Header: React.FC = () => {
   );
 };
 
-// --- Footer Component (Accordion Guide) ---
+// --- Footer Component (Accordion Guide - remains the same) ---
 const AccordionItem: React.FC<{ title: string; content: string; isOpen: boolean; onClick: () => void }> = ({ title, content, isOpen, onClick }) => (
     <div className="border-b border-border-color">
         <h2>
@@ -269,10 +336,26 @@ const Footer: React.FC = () => {
     );
 }
 
-// --- App Component ---
+// --- App Component (Conditional Rendering) ---
 const AppContent: React.FC = () => {
-    const { toast, hideToast } = useApp();
-    
+    // Get currentUser and authLoading directly from AppProvider via useApp()
+    const { toast, hideToast, currentUser, authLoading } = useApp(); 
+
+    // Show loading state while Firebase authentication is being initialized
+    if (authLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center text-text-base bg-background">
+                <p>Loading user session...</p>
+            </div>
+        );
+    }
+
+    // If no user is logged in after auth has loaded, show the login page
+    if (!currentUser) {
+        return <LoginPage />;
+    }
+
+    // If a user is logged in, show the main application content
     return (
         <div className="min-h-screen bg-background">
             {toast && <Toast message={toast.message} type={toast.type} onClose={hideToast} />}
@@ -287,8 +370,9 @@ const AppContent: React.FC = () => {
                 </div>
             </main>
             <Footer />
+            {/* <VisitorCounter /> If you're keeping the visitor counter, place it here */}
         </div>
-    )
+    );
 }
 
 const App: React.FC = () => {

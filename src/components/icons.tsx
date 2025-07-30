@@ -85,3 +85,43 @@ export const CheckCircleIcon = ({ className }: { className?: string }) => (
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
     </svg>
 );
+
+// --- NEW ICONS FOR LOGIN PAGE ---
+export const UserIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+  </svg>
+);
+
+export const LockClosedIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M9 10V7a3 3 0 013-3h0a3 3 0 013 3v3" />
+  </svg>
+);
+
+export const GoogleIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12.24 10.23c-.23-.73-.23-1.7-.01-2.45l2.25-1.93c.09-.09.13-.23.13-.36V3.88c0-.14-.05-.28-.15-.38l-1.92-2.18c-.09-.1-.23-.15-.37-.15H1.4c-.05 0-.1.02-.13.06-.03.04-.05.09-.05.15v20.06c0 .06.02.12.05.16.03.04.08.06.13.06h18.23c.14 0 .28-.05.37-.15l1.92-2.18c.1-.1.15-.24.15-.38v-1.68c0-.13-.04-.27-.13-.36l-2.25-1.93c-.22-.75-.22-1.72.01-2.45.24-.77.37-1.42.37-2.13 0-.7-.13-1.35-.37-2.12zM12.82 12c-1.38 0-2.5-.96-2.5-2.15S11.44 7.7 12.82 7.7c1.38 0 2.5.96 2.5 2.15S14.2 12 12.82 12z" />
+  </svg>
+);
+
+// Optional: Export all icons as a single object for convenience
+export const Icons = {
+  Clock: ClockIcon,
+  Location: LocationIcon,
+  Tag: TagIcon,
+  BookOpen: BookOpenIcon,
+  Plus: PlusIcon,
+  Trash: TrashIcon,
+  Calendar: CalendarIcon,
+  Edit: EditIcon,
+  Sun: SunIcon,
+  Moon: MoonIcon,
+  Male: MaleIcon,
+  Female: FemaleIcon,
+  CheckCircle: CheckCircleIcon,
+  User: UserIcon,
+  LockClosed: LockClosedIcon,
+  Google: GoogleIcon,
+};
